@@ -3,6 +3,8 @@ const path = require("path");
 
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+
 app.get("/pixel", (req, res) => {
 
     const ip =
@@ -14,6 +16,6 @@ app.get("/pixel", (req, res) => {
     res.sendFile(path.join(__dirname, "img/pixel.png"));
 });
 
-app.listen(3000, () => {
-    console.log("Running");
+app.listen(PORT, () => {
+    console.log(`Running on port ${PORT}`);
 });
