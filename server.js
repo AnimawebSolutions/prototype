@@ -10,38 +10,42 @@ app.get("/pixel", async (req, res) => {
 
     try {
 
-        // Obtener IP real
+        // IP real
         const forwarded = req.headers["x-forwarded-for"];
 
         const ip = forwarded
             ? forwarded.split(",")[0].trim()
             : req.socket.remoteAddress;
 
-        // Geolocalización IP
-        const response = await fetch(`https://ipwho.is/${ip}`);
+        // API GEO IP
+        const response = await fetch(`https://ipapi.co/${ip}/json/`);
 
         const data = await response.json();
 
-        // Fecha y hora
+        // Hora
         const now = new Date().toLocaleString();
 
-        // Headers útiles
-        const userAgent = req.headers["user-agent"] || "Unknown";
+        // Headers
+        const userAgent =
+            req.headers["user-agent"] || "Unknown";
 
-        const referer = req.headers["referer"] || "Direct";
+        const referer =
+            req.headers["referer"] || "Direct";
 
-        const language = req.headers["accept-language"] || "Unknown";
+        const language =
+            req.headers["accept-language"] || "Unknown";
 
-        // Log consola
+        // Consola
         console.log("==================================");
         console.log("TIME:", now);
         console.log("IP:", ip);
-        console.log("COUNTRY:", data.country);
+        console.log("COUNTRY:", data.country_name);
         console.log("CITY:", data.city);
         console.log("REGION:", data.region);
-        console.log("ISP:", data.connection?.isp);
-        console.log("ORG:", data.connection?.org);
-        console.log("TIMEZONE:", data.timezone?.id);
+        console.log("ISP:", data.org);
+        console.log("TIMEZONE:", data.timezone);
+        console.log("LATITUDE:", data.latitude);
+        console.log("LONGITUDE:", data.longitude);
         console.log("USER AGENT:", userAgent);
         console.log("LANGUAGE:", language);
         console.log("REFERER:", referer);
@@ -51,12 +55,13 @@ app.get("/pixel", async (req, res) => {
         const logData = {
             time: now,
             ip,
-            country: data.country,
+            country: data.country_name,
             city: data.city,
             region: data.region,
-            isp: data.connection?.isp,
-            org: data.connection?.org,
-            timezone: data.timezone?.id,
+            isp: data.org,
+            timezone: data.timezone,
+            latitude: data.latitude,
+            longitude: data.longitude,
             userAgent,
             language,
             referer
@@ -73,7 +78,6 @@ app.get("/pixel", async (req, res) => {
 
     }
 
-    // Enviar imagen
     res.sendFile(
         path.join(__dirname, "img/pixel.png")
     );
