@@ -71,6 +71,8 @@ app.get("/pixel", async (req, res) => {
             console.log("REGION:", geo.regionName);
             console.log("ISP:", geo.isp);
             console.log("ORG:", geo.org);
+            console.log("LATITUDE:", geo.lat);
+            console.log("LONGITUDE:", geo.lon);
             console.log("TIMEZONE:", geo.timezone);
 
         } else {
