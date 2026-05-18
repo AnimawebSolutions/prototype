@@ -16,10 +16,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node server.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^5.2.1",
-    "ts-node": "^10.9.2"
+    "express": "^5.2.1"
   }
 }
