@@ -1,7 +1,6 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const fetch = require("node-fetch");
 
 const app = express();
 
@@ -33,7 +32,7 @@ app.get("/pixel", async (req, res) => {
 
         const language = req.headers["accept-language"] || "Unknown";
 
-        // Log bonito en consola
+        // Log consola
         console.log("==================================");
         console.log("TIME:", now);
         console.log("IP:", ip);
@@ -48,19 +47,19 @@ app.get("/pixel", async (req, res) => {
         console.log("REFERER:", referer);
         console.log("==================================");
 
-        // Guardar en archivo
+        // Guardar archivo
         const logData = {
             time: now,
-            ip: ip,
+            ip,
             country: data.country,
             city: data.city,
             region: data.region,
             isp: data.connection?.isp,
             org: data.connection?.org,
             timezone: data.timezone?.id,
-            userAgent: userAgent,
-            language: language,
-            referer: referer
+            userAgent,
+            language,
+            referer
         };
 
         fs.appendFileSync(
