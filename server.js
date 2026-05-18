@@ -45,6 +45,8 @@ app.get("/pixel", async (req, res) => {
 
                 geo = await response.json();
 
+                console.log(geo);
+
                 cache[ip] = geo;
             }
         }
