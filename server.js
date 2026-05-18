@@ -4,28 +4,53 @@ const fs = require("fs");
 
 const app = express();
 
+// IMPORTANTE para Render / proxies
+app.set("trust proxy", true);
+
 const PORT = process.env.PORT || 3000;
+
+const cache = {};
 
 app.get("/pixel", async (req, res) => {
 
     try {
 
-        // IP real
-        const forwarded = req.headers["x-forwarded-for"];
+        // obtiene la IP real
+        const ip =
+            req.headers["x-forwarded-for"]?.split(",")[0].trim()
+            || req.socket.remoteAddress
+            || req.ip;
 
-        const ip = forwarded
-            ? forwarded.split(",")[0].trim()
-            : req.socket.remoteAddress;
+        let geo = {};
 
-        // API GEO IP
-        const response = await fetch(`https://ipapi.co/${ip}/json/`);
+        const isPrivate =
+            ip === "::1" ||
+            ip === "127.0.0.1" ||
+            ip.startsWith("10.") ||
+            ip.startsWith("192.168.") ||
+            ip.startsWith("172.");
 
-        const data = await response.json();
+        // GEO IP
+        if (!isPrivate) {
 
-        // Hora
+            if (cache[ip]) {
+
+                geo = cache[ip];
+
+            } else {
+
+                const response = await fetch(
+                    `https://ipwho.is/${ip}`
+                );
+
+                geo = await response.json();
+
+                cache[ip] = geo;
+            }
+        }
+
         const now = new Date().toLocaleString();
 
-        // Headers
         const userAgent =
             req.headers["user-agent"] || "Unknown";
 
@@ -35,41 +60,41 @@ app.get("/pixel", async (req, res) => {
         const language =
             req.headers["accept-language"] || "Unknown";
 
-        // Consola
         console.log("==================================");
         console.log("TIME:", now);
         console.log("IP:", ip);
-        console.log("COUNTRY:", data.country_name);
-        console.log("CITY:", data.city);
-        console.log("REGION:", data.region);
-        console.log("ISP:", data.org);
-        console.log("TIMEZONE:", data.timezone);
-        console.log("LATITUDE:", data.latitude);
-        console.log("LONGITUDE:", data.longitude);
+
+        if (!isPrivate) {
+
+            console.log("COUNTRY:", geo.country);
+            console.log("CITY:", geo.city);
+            console.log("REGION:", geo.region);
+            console.log("ISP:", geo.connection?.isp);
+            console.log("ORG:", geo.connection?.org);
+            console.log("TIMEZONE:", geo.timezone?.id);
+
+        } else {
+
+            console.log("LOCAL/PRIVATE IP");
+
+        }
+
         console.log("USER AGENT:", userAgent);
         console.log("LANGUAGE:", language);
         console.log("REFERER:", referer);
         console.log("==================================");
 
-        // Guardar archivo
-        const logData = {
-            time: now,
-            ip,
-            country: data.country_name,
-            city: data.city,
-            region: data.region,
-            isp: data.org,
-            timezone: data.timezone,
-            latitude: data.latitude,
-            longitude: data.longitude,
-            userAgent,
-            language,
-            referer
-        };
-
+        // Guardar logs
         fs.appendFileSync(
             "logs.txt",
-            JSON.stringify(logData) + "\n"
+            JSON.stringify({
+                time: now,
+                ip,
+                geo,
+                userAgent,
+                language,
+                referer
+            }) + "\n"
         );
 
     } catch (err) {
