@@ -11,7 +11,7 @@ app.get("/pixel", (req, res) => {
 
     console.log("IP:", ip);
 
-    res.sendFile(path.join(__dirname, "pixel.png"));
+    res.sendFile(path.join(__dirname, "img/pixel.png"));
 });
 
 app.listen(3000, () => {
