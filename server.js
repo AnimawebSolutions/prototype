@@ -39,9 +39,7 @@ app.get("/pixel", async (req, res) => {
 
             } else {
 
-                const response = await fetch(
-                    `https://ipwho.is/${ip}`
-                );
+                const response = await fetch(`http://ip-api.com/json/${ip}`);
 
                 geo = await response.json();
 
@@ -70,10 +68,10 @@ app.get("/pixel", async (req, res) => {
 
             console.log("COUNTRY:", geo.country);
             console.log("CITY:", geo.city);
-            console.log("REGION:", geo.region);
-            console.log("ISP:", geo.connection?.isp);
-            console.log("ORG:", geo.connection?.org);
-            console.log("TIMEZONE:", geo.timezone?.id);
+            console.log("REGION:", geo.regionName);
+            console.log("ISP:", geo.isp);
+            console.log("ORG:", geo.org);
+            console.log("TIMEZONE:", geo.timezone);
 
         } else {
 
